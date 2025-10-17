@@ -1,0 +1,16 @@
+{
+  "name": "idasen-desk-controller-miniprogram",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WeChat Mini Program for controlling IKEA Idasen desk via BLE",
+  "scripts": {
+    "dev:types": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "miniprogram-api-typings": "^4.0.3",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2"
+  }
+}

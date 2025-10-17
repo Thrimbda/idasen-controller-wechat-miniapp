@@ -1,0 +1,76 @@
+<view class="page">
+  <view class="card preset-card">
+    <view class="card-title">姿势预设</view>
+
+    <view class="preset-item">
+      <view class="preset-header">
+        <text class="preset-name">站立高度</text>
+        <text class="preset-hint">{{standHeightInput ? '当前 ' + standHeightInput + ' ' + unit : '尚未设置'}}</text>
+      </view>
+      <view class="preset-controls">
+        <input
+          class="preset-input"
+          type="digit"
+          value="{{standHeightInput}}"
+          data-target="stand"
+          bindinput="onPresetInput"
+          placeholder="输入高度"
+        />
+        <text class="unit-label">{{unit}}</text>
+      </view>
+      <view class="preset-actions">
+        <button class="btn ghost" data-target="stand" bindtap="onUseCurrentHeight">使用当前高度</button>
+        <button class="btn primary" data-target="stand" bindtap="onSavePreset">保存</button>
+      </view>
+    </view>
+
+    <view class="preset-item">
+      <view class="preset-header">
+        <text class="preset-name">坐下高度</text>
+        <text class="preset-hint">{{sitHeightInput ? '当前 ' + sitHeightInput + ' ' + unit : '尚未设置'}}</text>
+      </view>
+      <view class="preset-controls">
+        <input
+          class="preset-input"
+          type="digit"
+          value="{{sitHeightInput}}"
+          data-target="sit"
+          bindinput="onPresetInput"
+          placeholder="输入高度"
+        />
+        <text class="unit-label">{{unit}}</text>
+      </view>
+      <view class="preset-actions">
+        <button class="btn ghost" data-target="sit" bindtap="onUseCurrentHeight">使用当前高度</button>
+        <button class="btn primary" data-target="sit" bindtap="onSavePreset">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">显示单位</view>
+    <radio-group class="radio-group" bindchange="onUnitChange">
+      <label class="radio-item">
+        <radio value="cm" checked="{{unit === 'cm'}}" />
+        <text>厘米 (cm)</text>
+      </label>
+      <label class="radio-item">
+        <radio value="inch" checked="{{unit === 'inch'}}" />
+        <text>英寸 (inch)</text>
+      </label>
+    </radio-group>
+  </view>
+
+  <view class="card">
+    <view class="card-title">蓝牙连接</view>
+    <view class="row">
+      <text>自动重连上次设备</text>
+      <switch checked="{{autoReconnect}}" bindchange="onAutoReconnectChange" />
+    </view>
+    <view class="info">
+      <text>当前连接：{{connectedDeviceId || '无'}}</text>
+      <text>当前高度：{{currentHeightDisplay}}</text>
+      <text>指令状态：{{pendingCommand}}</text>
+    </view>
+  </view>
+</view>

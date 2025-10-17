@@ -1,0 +1,137 @@
+.page {
+  padding: 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  background: #f5f6f8;
+  min-height: 100vh;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  box-shadow: 0 12rpx 32rpx rgba(31, 41, 51, 0.05);
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+  color: #1f2933;
+}
+
+.preset-card {
+  display: flex;
+  flex-direction: column;
+  gap: 28rpx;
+}
+
+.preset-item {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  padding: 24rpx;
+  background: #f8fafc;
+  border-radius: 20rpx;
+}
+
+.preset-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.preset-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #111827;
+}
+
+.preset-hint {
+  font-size: 24rpx;
+  color: #6b7280;
+}
+
+.preset-controls {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.preset-input {
+  flex: 1;
+  background: #ffffff;
+  border: 1rpx solid #d1d5db;
+  border-radius: 16rpx;
+  padding: 16rpx 20rpx;
+  font-size: 30rpx;
+  color: #111827;
+}
+
+.unit-label {
+  font-size: 26rpx;
+  color: #6b7280;
+  min-width: 64rpx;
+  text-align: right;
+}
+
+.preset-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.btn {
+  flex: 1;
+  border-radius: 16rpx;
+  padding: 16rpx 0;
+  font-size: 28rpx;
+  border: none;
+}
+
+.btn::after {
+  border: none;
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  color: #ffffff;
+  box-shadow: 0 10rpx 24rpx rgba(37, 99, 235, 0.2);
+}
+
+.btn.ghost {
+  background: #ffffff;
+  border: 1rpx solid #d1d5db;
+  color: #1f2933;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.radio-item {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 30rpx;
+  color: #111827;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 30rpx;
+  color: #111827;
+}
+
+.info {
+  margin-top: 16rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  font-size: 26rpx;
+  color: #6b7280;
+}

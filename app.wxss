@@ -1,0 +1,21 @@
+page {
+  background-color: #f7f8fa;
+  color: #1f2933;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  color: #ffffff;
+  border-radius: 24rpx;
+  padding: 20rpx 40rpx;
+  text-align: center;
+}
+
+.btn-secondary {
+  background: #e5e7eb;
+  color: #111827;
+  border-radius: 24rpx;
+  padding: 20rpx 40rpx;
+  text-align: center;
+}

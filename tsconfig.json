@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    },
+    "strict": true,
+    "noImplicitAny": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    "types": ["miniprogram-api-typings", "vitest/globals", "node"],
+    "lib": ["ES2019"],
+    "skipLibCheck": true
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

@@ -1,0 +1,59 @@
+<view class="page">
+  <view class="card headline">
+    <view class="title">连接宜家桌子</view>
+    <view class="description">
+      确保蓝牙已开启，并保持桌子处于待连接状态。
+    </view>
+    <view class="status" wx:if="{{lastDeviceId}}">
+      <text>上次连接：{{lastDeviceId}}</text>
+    </view>
+    <view class="actions">
+      <button
+        class="btn primary"
+        bindtap="onScanTap"
+        wx:if="{{!isScanning}}"
+      >
+        扫描设备
+      </button>
+      <button
+        class="btn secondary"
+        bindtap="onStopScanTap"
+        wx:elif="{{isScanning}}"
+      >
+        停止扫描
+      </button>
+      <button
+        class="btn ghost"
+        bindtap="onDisconnect"
+        wx:if="{{connectedDeviceId}}"
+      >
+        断开当前设备
+      </button>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{devices.length}}">
+    <view class="card-title">附近设备</view>
+    <block wx:for="{{devices}}" wx:key="deviceId">
+      <view class="device">
+        <view>
+          <text class="device-name">{{item.name}}</text>
+          <text class="device-meta">RSSI {{item.RSSI}}</text>
+        </view>
+        <button
+          class="btn small"
+          data-device-id="{{item.deviceId}}"
+          bindtap="onConnect"
+          wx:if="{{connectedDeviceId !== item.deviceId}}"
+        >
+          连接
+        </button>
+        <text class="device-connected" wx:else>已连接</text>
+      </view>
+    </block>
+  </view>
+
+  <view class="card empty" wx:if="{{!devices.length}}">
+    <text>{{isScanning ? '正在扫描附近的桌子...' : '点击“扫描设备”开始搜索附近的桌子。'}}</text>
+  </view>
+</view>

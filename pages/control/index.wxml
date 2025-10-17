@@ -1,0 +1,103 @@
+<view class="page">
+  <view class="header">
+    <view class="status-pill {{connected ? 'connected' : 'disconnected'}}">
+      <view class="status-dot"></view>
+      <text class="status-text">{{connected ? '已连接' : '未连接'}}</text>
+    </view>
+    <view class="header-actions">
+      <button
+        class="icon-button bluetooth"
+        bindtap="navigateToConnection"
+        wx:if="{{!connected}}"
+      >
+        <text class="icon-button-text">蓝牙</text>
+      </button>
+      <button class="icon-button gear" bindtap="navigateToSettings">
+        <image class="icon-image" src="/assets/icons/gear.svg" mode="aspectFit" />
+      </button>
+    </view>
+  </view>
+
+  <view class="card height-card">
+    <view class="height-value">{{currentHeight}}</view>
+    <view class="height-unit">{{unit === 'cm' ? '厘米' : '英寸'}}</view>
+    <view class="height-meta">速度：{{currentSpeed}}</view>
+  </view>
+
+  <view class="card preset-card" wx:if="{{connected}}">
+    <view class="card-title">快速姿势</view>
+    <view class="preset-list">
+      <view class="preset-item-row">
+        <button
+          class="preset-button stand"
+          wx:if="{{activePreset !== 'stand'}}"
+          data-target="stand"
+          bindtap="onPresetTap"
+          disabled="{{standPresetHeight === '--'}}"
+        >
+          <view class="preset-label">站立</view>
+          <view class="preset-value">{{standPresetHeight}}</view>
+        </button>
+        <button
+          class="preset-button stop"
+          wx:else
+          data-target="stand"
+          bindtap="onPresetStop"
+        >
+          停止站立
+        </button>
+      </view>
+
+      <view class="preset-item-row">
+        <button
+          class="preset-button sit"
+          wx:if="{{activePreset !== 'sit'}}"
+          data-target="sit"
+          bindtap="onPresetTap"
+          disabled="{{sitPresetHeight === '--'}}"
+        >
+          <view class="preset-label">坐下</view>
+          <view class="preset-value">{{sitPresetHeight}}</view>
+        </button>
+        <button
+          class="preset-button stop"
+          wx:else
+          data-target="sit"
+          bindtap="onPresetStop"
+        >
+          停止坐下
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <view class="card manual-card" wx:if="{{connected}}">
+    <view class="card-title">手动控制</view>
+    <view class="manual-note">长按按钮持续移动，松开即停止。</view>
+    <view class="controls-row">
+      <button
+        class="control-button up {{pendingCommand === 'up' ? 'active' : ''}}"
+        data-command="up"
+        bindtouchstart="onControlTouchStart"
+        bindtouchend="onControlTouchEnd"
+        bindtouchcancel="onControlTouchCancel"
+      >
+        <text class="control-icon">↑</text>
+      </button>
+      <button
+        class="control-button down {{pendingCommand === 'down' ? 'active' : ''}}"
+        data-command="down"
+        bindtouchstart="onControlTouchStart"
+        bindtouchend="onControlTouchEnd"
+        bindtouchcancel="onControlTouchCancel"
+      >
+        <text class="control-icon">↓</text>
+      </button>
+    </view>
+  </view>
+
+  <view class="card tip-card" wx:if="{{!connected}}">
+    <view class="card-title">小贴士</view>
+    <view class="tip-text">请先前往蓝牙页面连接桌子。</view>
+  </view>
+</view>

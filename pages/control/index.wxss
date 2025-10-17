@@ -1,0 +1,255 @@
+.page {
+  padding: 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  background: #f5f6f8;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 10rpx 24rpx;
+  min-height: 48rpx;
+  border-radius: 999rpx;
+  background: #e5e7eb;
+  font-size: 28rpx;
+  color: #4b5563;
+}
+
+.status-pill.connected {
+  background: rgba(52, 211, 153, 0.14);
+  color: #047857;
+}
+
+.status-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: #d1d5db;
+}
+
+.status-pill.connected .status-dot {
+  background: #34d399;
+}
+
+.status-text {
+  line-height: 1;
+}
+
+.header-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 999rpx;
+  background: #f3f4f6;
+  box-shadow: 0 8rpx 18rpx rgba(15, 23, 42, 0.08);
+  color: #1f2933;
+  font-size: 22rpx;
+}
+
+.icon-button::after {
+  border: none;
+}
+
+.icon-button:hover {
+  opacity: 0.9;
+}
+
+.icon-button.bluetooth {
+  width: auto;
+  height: auto;
+  padding: 10rpx 24rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #ffffff;
+  box-shadow: 0 10rpx 24rpx rgba(37, 99, 235, 0.25);
+  font-size: 26rpx;
+}
+
+.icon-button-text {
+  display: inline-block;
+  line-height: 1;
+}
+
+.icon-button.gear {
+  background: #fff;
+  border: 1rpx solid #e5e7eb;
+}
+
+.icon-button.gear .icon-image {
+  width: 34rpx;
+  height: 34rpx;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  box-shadow: 0 12rpx 32rpx rgba(31, 41, 51, 0.05);
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 500;
+  margin-bottom: 20rpx;
+  color: #1f2933;
+}
+
+.height-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.height-value {
+  font-size: 72rpx;
+  font-weight: 700;
+  color: #111827;
+}
+
+.height-unit {
+  font-size: 28rpx;
+  color: #6b7280;
+}
+
+.height-meta {
+  font-size: 26rpx;
+  color: #4b5563;
+}
+
+.manual-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.manual-note {
+  font-size: 26rpx;
+  color: #6b7280;
+}
+
+.controls-row {
+  display: flex;
+  gap: 28rpx;
+  justify-content: center;
+}
+
+.control-button {
+  width: 72rpx;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 16rpx 32rpx rgba(37, 99, 235, 0.2);
+  transition: transform 0.15s ease;
+}
+
+.control-button::after {
+  border: none;
+}
+
+.control-button.active {
+  transform: scale(0.96);
+}
+
+.control-icon {
+  font-size: 64rpx;
+  line-height: 1;
+}
+
+.control-button.down {
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+}
+
+.preset-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.preset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.preset-item-row {
+  display: flex;
+}
+
+.preset-button {
+  flex: 1;
+  border: none;
+  border-radius: 24rpx;
+  padding: 28rpx 28rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  color: #ffffff;
+  font-size: 30rpx;
+  box-shadow: 0 12rpx 28rpx rgba(37, 99, 235, 0.18);
+}
+
+.preset-button::after {
+  border: none;
+}
+
+.preset-button:disabled {
+  opacity: 0.5;
+}
+
+.preset-button.stand {
+  background: linear-gradient(135deg, #34d399, #10b981);
+}
+
+.preset-button.sit {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.preset-button.stop {
+  background: #f1f5f9;
+  color: #1f2933;
+  box-shadow: none;
+}
+
+.preset-label {
+  font-weight: 600;
+  font-size: 34rpx;
+}
+
+.preset-value {
+  font-size: 26rpx;
+  opacity: 0.85;
+}
+
+.tip-card {
+  color: #4b5563;
+}
+
+.tip-text {
+  font-size: 28rpx;
+}

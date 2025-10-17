@@ -1,0 +1,15 @@
+{
+  "pages": [
+    "pages/control/index",
+    "pages/connection/index",
+    "pages/settings/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "Idasen 桌子控制器",
+    "navigationBarBackgroundColor": "#1F2933",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F7F8FA"
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}

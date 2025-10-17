@@ -1,0 +1,114 @@
+.page {
+  padding: 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  background: #f5f6f8;
+  min-height: 100vh;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  box-shadow: 0 12rpx 32rpx rgba(31, 41, 51, 0.05);
+}
+
+.headline .title {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #1f2933;
+}
+
+.headline .description {
+  margin-top: 12rpx;
+  font-size: 28rpx;
+  color: #6b7280;
+}
+
+.actions {
+  margin-top: 24rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.status {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: #4b5563;
+}
+
+.btn {
+  border-radius: 999rpx;
+  padding: 16rpx 32rpx;
+  font-size: 28rpx;
+  border: none;
+}
+
+.btn::after {
+  border: none;
+}
+
+.primary {
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  color: #ffffff;
+}
+
+.secondary {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.ghost {
+  background: transparent;
+  border: 1rpx solid #d1d5db;
+  color: #1f2933;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 500;
+  margin-bottom: 16rpx;
+  color: #1f2933;
+}
+
+.device {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #eef2f8;
+}
+
+.device:last-child {
+  border-bottom: none;
+}
+
+.device-name {
+  font-size: 30rpx;
+  color: #111827;
+}
+
+.device-meta {
+  font-size: 24rpx;
+  color: #6b7280;
+}
+
+.device-connected {
+  color: #22c55e;
+  font-size: 26rpx;
+}
+
+.small {
+  padding: 12rpx 24rpx;
+  font-size: 26rpx;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.empty {
+  color: #6b7280;
+  text-align: center;
+  font-size: 28rpx;
+}
