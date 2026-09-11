@@ -16,9 +16,30 @@ export interface DiscoveredDevice {
   localName?: string | null;
 }
 
+export interface RememberedDesk {
+  deviceId: string;
+  deviceName: string;
+  nickname?: string;
+}
+
+export const DEFAULT_REMEMBERED_DESK_NAME = "已记住的桌子";
+
+export const getDeskDisplayName = (desk: RememberedDesk | null | undefined): string => {
+  const nickname = desk?.nickname?.trim();
+  if (nickname) {
+    return nickname;
+  }
+
+  const deviceName = desk?.deviceName?.trim();
+  return deviceName || DEFAULT_REMEMBERED_DESK_NAME;
+};
+
 export interface AppState {
   presets: Preset[];
   unit: Unit;
+  rememberedDesks: RememberedDesk[];
+  activeDeskId: string | null;
+  pendingDeskId: string | null;
   connectedDeviceId: string | null;
   currentHeight: number | null;
   isScanning: boolean;
@@ -52,6 +73,9 @@ export const CORE_PRESETS: ReadonlyArray<Preset> = defaultPresets;
 const defaultState: AppState = {
   presets: [...defaultPresets],
   unit: "cm",
+  rememberedDesks: [],
+  activeDeskId: null,
+  pendingDeskId: null,
   connectedDeviceId: null,
   currentHeight: null,
   isScanning: false,
@@ -67,7 +91,10 @@ export const createAppStore = (initialState: Partial<AppState> = {}): AppStore =
   let state: AppState = {
     ...defaultState,
     ...initialState,
-    presets: initialState.presets ? [...initialState.presets] : [...defaultState.presets]
+    presets: initialState.presets ? [...initialState.presets] : [...defaultState.presets],
+    rememberedDesks: initialState.rememberedDesks
+      ? initialState.rememberedDesks.map((desk) => ({ ...desk }))
+      : []
   };
   const listeners = new Set<StateListener>();
 
@@ -90,13 +117,20 @@ export const createAppStore = (initialState: Partial<AppState> = {}): AppStore =
       state = {
         ...state,
         ...partial,
-        presets: partial.presets ? [...partial.presets] : state.presets
+        presets: partial.presets ? [...partial.presets] : state.presets,
+        rememberedDesks: partial.rememberedDesks
+          ? partial.rememberedDesks.map((desk) => ({ ...desk }))
+          : state.rememberedDesks
       };
       notify();
       return state;
     },
     reset() {
-      state = { ...defaultState, presets: [...defaultState.presets] };
+      state = {
+        ...defaultState,
+        presets: [...defaultState.presets],
+        rememberedDesks: []
+      };
       notify();
       return state;
     }

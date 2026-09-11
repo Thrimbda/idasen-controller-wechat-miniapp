@@ -22,9 +22,11 @@ export interface DeviceFoundPayload {
 export interface ConnectionStatePayload {
   deviceId: string;
   connected: boolean;
+  ready?: boolean;
 }
 
 export interface PositionPayload {
+  deviceId: string;
   height: number;
   speed: number;
   rawHeight: number;
@@ -109,36 +111,37 @@ export class DeskBleClient {
       wx.onBluetoothDeviceFound((result) => {
         result.devices.forEach((device) => {
           const resolvedName = device.name ?? device.localName ?? "";
-          console.info("[BLE] 发现原始设备", device.deviceId, resolvedName, {
+          console.info("[BLE] 发现原始设备", resolvedName, {
             RSSI: device.RSSI,
             advertisServiceUUIDs: device.advertisServiceUUIDs
           });
 
           if (!resolvedName) {
-            console.debug("[BLE] 忽略无名称设备", device.deviceId);
+            console.debug("[BLE] 忽略无名称设备");
             return;
           }
 
           if (!this.nameMatcher(resolvedName)) {
-            console.debug("[BLE] 忽略设备", device.deviceId, resolvedName);
+            console.debug("[BLE] 忽略设备", resolvedName);
             return;
           }
 
-          console.info("[BLE] 匹配设备", device.deviceId, resolvedName);
+          console.info("[BLE] 匹配设备", resolvedName);
           this.emit("deviceFound", { device });
         });
       });
 
       wx.onBLEConnectionStateChange((res) => {
-        if (res.deviceId === this.currentDeviceId && !res.connected) {
-          this.currentDeviceId = null;
-          this.hasSubscribedPosition = false;
+        if (res.deviceId !== this.currentDeviceId) {
+          return;
         }
 
-        this.emit("connectionState", {
-          deviceId: res.deviceId,
-          connected: !!res.connected
-        });
+        if (res.connected) {
+          console.info("[BLE] Transport connected");
+          return;
+        }
+
+        this.releaseConnection(res.deviceId);
       });
 
       wx.onBLECharacteristicValueChange((res) => {
@@ -150,7 +153,7 @@ export class DeskBleClient {
         ) {
           try {
             const snapshot = decodePositionSnapshot(res.value);
-            this.emit("position", snapshot);
+            this.emit("position", { ...snapshot, deviceId: res.deviceId });
           } catch (error) {
             this.emit("error", {
               message: "Failed to decode position payload",
@@ -215,18 +218,34 @@ export class DeskBleClient {
 
   async connect(deviceId: string): Promise<void> {
     ensureWx();
+    if (this.currentDeviceId) {
+      throw new Error("A BLE connection is still active");
+    }
+
     await this.stopScan();
 
     try {
-      this.positionServiceId = null;
-      this.positionCharacteristicId = null;
-      this.controlServiceId = null;
-      this.controlCharacteristicId = null;
+      this.resetConnectionState();
       await promisify(wx.createBLEConnection as unknown as (options: any) => void, { deviceId });
       this.currentDeviceId = deviceId;
       await this.discoverServices(deviceId);
-      this.emit("connectionState", { deviceId, connected: true });
+
+      if (this.currentDeviceId !== deviceId) {
+        throw new Error("BLE connection closed before service discovery completed");
+      }
+
+      this.emit("connectionState", { deviceId, connected: true, ready: true });
     } catch (error) {
+      try {
+        await this.closeFailedCandidate(deviceId);
+      } catch (cleanupError) {
+        this.emit("error", {
+          message: "连接设备失败，且无法关闭候选连接",
+          error: cleanupError
+        });
+        throw cleanupError;
+      }
+
       this.emit("error", { message: "连接设备失败", error });
       throw error;
     }
@@ -243,15 +262,10 @@ export class DeskBleClient {
       await promisify(wx.closeBLEConnection as unknown as (options: any) => void, { deviceId });
     } catch (error) {
       this.emit("error", { message: "断开连接失败", error });
-    } finally {
-      this.currentDeviceId = null;
-      this.hasSubscribedPosition = false;
-      this.positionServiceId = null;
-      this.positionCharacteristicId = null;
-      this.controlServiceId = null;
-      this.controlCharacteristicId = null;
-      this.emit("connectionState", { deviceId, connected: false });
+      throw error;
     }
+
+    this.releaseConnection(deviceId);
   }
 
   async writeCommand(command: MovementCommand): Promise<void> {
@@ -326,6 +340,32 @@ export class DeskBleClient {
       this.emit("error", { message: "读取高度失败", error });
       throw error;
     }
+  }
+
+  private resetConnectionState() {
+    this.currentDeviceId = null;
+    this.hasSubscribedPosition = false;
+    this.positionServiceId = null;
+    this.positionCharacteristicId = null;
+    this.controlServiceId = null;
+    this.controlCharacteristicId = null;
+  }
+
+  private releaseConnection(deviceId: string) {
+    if (this.currentDeviceId !== deviceId) {
+      return;
+    }
+    this.resetConnectionState();
+    this.emit("connectionState", { deviceId, connected: false });
+  }
+
+  private async closeFailedCandidate(deviceId: string): Promise<void> {
+    if (this.currentDeviceId !== deviceId) {
+      return;
+    }
+
+    await promisify(wx.closeBLEConnection as unknown as (options: any) => void, { deviceId });
+    this.releaseConnection(deviceId);
   }
 
   private async discoverServices(deviceId: string): Promise<void> {

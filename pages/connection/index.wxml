@@ -1,59 +1,153 @@
-<view class="page">
-  <view class="card headline">
-    <view class="title">连接宜家桌子</view>
-    <view class="description">
-      确保蓝牙已开启，并保持桌子处于待连接状态。
+<view class="page connection-page">
+  <view class="page-header">
+    <view class="header-copy">
+      <text class="eyebrow">DESK CONTROLLER</text>
+      <text class="page-title">设备连接</text>
     </view>
-    <view class="status" wx:if="{{lastDeviceId}}">
-      <text>上次连接：{{lastDeviceId}}</text>
-    </view>
-    <view class="actions">
-      <button
-        class="btn primary"
-        bindtap="onScanTap"
-        wx:if="{{!isScanning}}"
-      >
-        扫描设备
-      </button>
-      <button
-        class="btn secondary"
-        bindtap="onStopScanTap"
-        wx:elif="{{isScanning}}"
-      >
-        停止扫描
-      </button>
-      <button
-        class="btn ghost"
-        bindtap="onDisconnect"
-        wx:if="{{connectedDeviceId}}"
-      >
-        断开当前设备
-      </button>
-    </view>
+    <button
+      class="header-action button-ghost"
+      hover-class="button-pressed"
+      bindtap="navigateToControl"
+    >
+      控制台
+    </button>
   </view>
+  <text class="page-description">靠近你的升降桌，连接后开始调整。</text>
 
-  <view class="card" wx:if="{{devices.length}}">
-    <view class="card-title">附近设备</view>
-    <block wx:for="{{devices}}" wx:key="deviceId">
-      <view class="device">
-        <view>
-          <text class="device-name">{{item.name}}</text>
-          <text class="device-meta">RSSI {{item.RSSI}}</text>
+  <view class="section" wx:if="{{hasRememberedDesks}}">
+    <view class="section-heading">
+      <text class="section-title">已记住的桌子</text>
+      <text class="section-note">{{rememberedDeskCount}} 台</text>
+    </view>
+    <view class="device-list">
+      <view class="device-row" wx:for="{{rememberedDesks}}" wx:key="deviceId">
+        <view class="device-main">
+          <view class="desk-icon"></view>
+          <view class="row-copy">
+            <text class="device-name">{{item.name}}</text>
+            <text
+              class="device-meta {{item.isCurrent ? 'is-connected' : (item.isConnecting ? 'is-pending' : '')}}"
+            >
+              {{item.isCurrent ? '已连接 · 当前控制' : (item.isConnecting ?
+              '正在连接…' : (item.isActive ? '上次连接' : '已保存'))}}
+            </text>
+          </view>
         </view>
-        <button
-          class="btn small"
-          data-device-id="{{item.deviceId}}"
-          bindtap="onConnect"
-          wx:if="{{connectedDeviceId !== item.deviceId}}"
-        >
-          连接
-        </button>
-        <text class="device-connected" wx:else>已连接</text>
+        <view class="device-actions">
+          <button
+            class="rename-action button-ghost"
+            hover-class="button-pressed"
+            data-device-id="{{item.deviceId}}"
+            bindtap="onRenameDesk"
+            disabled="{{isConnecting}}"
+          >
+            改名
+          </button>
+          <button
+            class="connect-action button-secondary"
+            hover-class="button-pressed"
+            data-device-id="{{item.deviceId}}"
+            bindtap="onRememberedConnect"
+            disabled="{{isConnecting}}"
+            wx:if="{{!item.isCurrent}}"
+          >
+            {{item.isConnecting ? '连接中' : '连接'}}
+          </button>
+          <button
+            class="connect-action button-secondary"
+            hover-class="button-pressed"
+            bindtap="navigateToControl"
+            wx:else
+          >
+            控制
+          </button>
+        </view>
       </view>
-    </block>
+    </view>
   </view>
 
-  <view class="card empty" wx:if="{{!devices.length}}">
-    <text>{{isScanning ? '正在扫描附近的桌子...' : '点击“扫描设备”开始搜索附近的桌子。'}}</text>
+  <view class="section scan-section">
+    <view class="section-heading">
+      <text class="section-title">
+        {{replacementDeskName ? '替换设备' : '附近的设备'}}
+      </text>
+      <text class="section-note" wx:if="{{deviceCount}}">
+        {{deviceCount}} 台
+      </text>
+    </view>
+    <view class="scan-toolbar">
+      <view class="scan-copy">
+        <view class="status {{isScanning ? 'is-pending' : ''}}">
+          <view class="status-dot"></view>
+          <text>
+            {{isScanning ? '正在搜索…' : (hasScanned ? '搜索已停止' :
+            '准备搜索')}}
+          </text>
+        </view>
+        <text class="scan-hint">
+          {{replacementDeskName ? '为「' + replacementDeskName + '」选择新设备'
+          : '保持蓝牙开启与小程序在前台'}}
+        </text>
+      </view>
+      <button
+        class="scan-button {{isScanning ? 'button-secondary' : 'button-primary'}}"
+        hover-class="button-pressed"
+        bindtap="onScanAction"
+        disabled="{{isConnecting}}"
+      >
+        {{isScanning ? '停止搜索' : (hasScanned ? '重新搜索' : '搜索设备')}}
+      </button>
+    </view>
+    <text class="inline-error" wx:if="{{errorMessage}}">{{errorMessage}}</text>
+    <view class="device-list discovered-list" wx:if="{{deviceCount}}">
+      <view class="device-row" wx:for="{{devices}}" wx:key="deviceId">
+        <view class="device-main">
+          <view class="desk-icon"></view>
+          <view class="row-copy">
+            <text class="device-name">{{item.name}}</text>
+            <text class="device-meta">
+              {{item.isConnecting ? '正在连接…' : (replacementDeskName ?
+              '连接后更新设备，保留名称' : '蓝牙升降桌')}}
+            </text>
+          </view>
+        </view>
+        <view class="device-actions">
+          <text class="signal-copy numeric">
+            {{item.RSSI ? item.RSSI + ' dBm' : '信号未知'}}
+          </text>
+          <button
+            class="connect-action button-secondary"
+            hover-class="button-pressed"
+            data-device-id="{{item.deviceId}}"
+            bindtap="onConnect"
+            disabled="{{isConnecting}}"
+          >
+            {{item.isConnecting ? '连接中' : '连接'}}
+          </button>
+        </view>
+      </view>
+    </view>
+    <view class="empty-state" wx:else>
+      <view class="empty-desk"><view class="desk-icon"></view></view>
+      <text class="empty-title">
+        {{isScanning ? '寻找你的升降桌' : (hasScanned ? '暂未发现设备' :
+        '还没有发现设备')}}
+      </text>
+      <text class="empty-copy">
+        {{isScanning ? '请靠近桌子，搜索结果会显示在这里。' :
+        '确认桌子已通电、蓝牙已开启，再试一次。'}}
+      </text>
+    </view>
+  </view>
+  <view class="connection-footer">
+    <text>连接成功后，桌子会自动保留在此设备上。</text>
+    <button
+      class="disconnect-button"
+      hover-class="button-pressed"
+      bindtap="onDisconnect"
+      wx:if="{{connectedDeviceId}}"
+    >
+      断开当前桌子
+    </button>
   </view>
 </view>

@@ -5,6 +5,7 @@ import type { Preset } from "./utils/store";
 import { loadAutoReconnect, loadPresets, loadUnit, loadLastDeviceId } from "./utils/storage";
 import { getDeskService } from "./utils/desk-service";
 import { setAppStore } from "./utils/app-context";
+import { endSession, recordUiError, startSession } from "./utils/analytics";
 
 const store = createAppStore();
 setAppStore(store);
@@ -53,17 +54,24 @@ App<IAppOption>({
     }
   },
 
-  onShow() {},
+  onShow(options) {
+    startSession(options);
+  },
 
-  onHide() {},
+  onHide() {
+    endSession("app_hide");
+  },
 
   onPageNotFound() {},
 
-  onUnhandledRejection() {},
+  onUnhandledRejection(err) {
+    recordUiError(err);
+  },
 
   onThemeChange() {},
 
   onError(err) {
     console.error("App error:", err);
+    recordUiError(err);
   }
 });

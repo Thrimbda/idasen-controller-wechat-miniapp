@@ -41,12 +41,17 @@ describe("desk-protocol", () => {
     const command = determineMovementCommand(100, 120);
     expect(command).toBe("up");
 
-    const stopCommand = determineMovementCommand(100.1, 100.3, DEFAULT_TOLERANCE);
+    const stopCommand = determineMovementCommand(100, 100.05, DEFAULT_TOLERANCE);
     expect(stopCommand).toBe("stop");
+    expect(determineMovementCommand(100, 100.2, DEFAULT_TOLERANCE)).toBe("up");
+    expect(determineMovementCommand(100, 99.8, DEFAULT_TOLERANCE)).toBe("down");
   });
 
   it("checks tolerance correctly", () => {
-    expect(isWithinTolerance(100, 100.4, DEFAULT_TOLERANCE)).toBe(true);
-    expect(isWithinTolerance(100, 101, DEFAULT_TOLERANCE)).toBe(false);
+    expect(isWithinTolerance(100, 100.05, DEFAULT_TOLERANCE)).toBe(true);
+    expect(isWithinTolerance(100, 99.95, DEFAULT_TOLERANCE)).toBe(true);
+    expect(isWithinTolerance(100, 100.2, DEFAULT_TOLERANCE)).toBe(false);
+    expect(isWithinTolerance(100, 99.8, DEFAULT_TOLERANCE)).toBe(false);
+    expect(isWithinTolerance(100, 100.4, 0.5)).toBe(true);
   });
 });
