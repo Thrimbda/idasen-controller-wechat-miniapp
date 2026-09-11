@@ -19,8 +19,10 @@ describe("format utils", () => {
     expect(formatHeight(null, "cm")).toBe("--");
   });
 
-  it("formats speed", () => {
-    expect(formatSpeed(2.456)).toBe("2.46 cm/s");
+  it("converts speed from cm/s to signed mm/s", () => {
+    expect(formatSpeed(2.456)).toBe("25 mm/s");
+    expect(formatSpeed(-2.456)).toBe("-25 mm/s");
+    expect(formatSpeed(0)).toBe("0 mm/s");
     expect(formatSpeed(null)).toBe("--");
   });
 });

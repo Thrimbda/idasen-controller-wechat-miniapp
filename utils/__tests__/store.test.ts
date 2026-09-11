@@ -22,4 +22,20 @@ describe("store", () => {
     store.reset();
     expect(store.getState().connectedDeviceId).toBeNull();
   });
+
+  it("keeps remembered desk records immutable across state updates", () => {
+    const desks = [{ deviceId: "desk-a", deviceName: "Desk A", nickname: "书房桌" }];
+    const store = createAppStore({ rememberedDesks: desks, activeDeskId: "desk-a" });
+
+    desks[0].nickname = "外部修改";
+    store.setState({ rememberedDesks: [{ deviceId: "desk-b", deviceName: "Desk B" }] });
+
+    expect(store.getState().rememberedDesks).toEqual([{
+      deviceId: "desk-b",
+      deviceName: "Desk B"
+    }]);
+    store.reset();
+    expect(store.getState().rememberedDesks).toEqual([]);
+    expect(store.getState().activeDeskId).toBeNull();
+  });
 });

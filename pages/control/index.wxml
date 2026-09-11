@@ -1,103 +1,182 @@
-<view class="page">
-  <view class="header">
-    <view class="status-pill {{connected ? 'connected' : 'disconnected'}}">
+<view class="page control-page">
+  <view class="page-header">
+    <view class="header-copy">
+      <text class="eyebrow">DESK CONTROLLER</text>
+      <text class="page-title">{{activeDeskName || '我的升降桌'}}</text>
+    </view>
+    <button
+      class="header-action button-ghost"
+      hover-class="button-pressed"
+      bindtap="navigateToSettings"
+    >
+      设置
+    </button>
+  </view>
+
+  <view class="desk-connection">
+    <view
+      class="status {{isSwitching ? 'is-pending' : (connected ? 'is-connected' : '')}}"
+    >
       <view class="status-dot"></view>
-      <text class="status-text">{{connected ? '已连接' : '未连接'}}</text>
+      <text>
+        {{isSwitching ? '正在连接' : (connected ? '已连接' : '未连接')}}
+      </text>
     </view>
-    <view class="header-actions">
-      <button
-        class="icon-button bluetooth"
-        bindtap="navigateToConnection"
-        wx:if="{{!connected}}"
-      >
-        <text class="icon-button-text">蓝牙</text>
-      </button>
-      <button class="icon-button gear" bindtap="navigateToSettings">
-        <image class="icon-image" src="/assets/icons/gear.svg" mode="aspectFit" />
-      </button>
-    </view>
-  </view>
-
-  <view class="card height-card">
-    <view class="height-value">{{currentHeight}}</view>
-    <view class="height-unit">{{unit === 'cm' ? '厘米' : '英寸'}}</view>
-    <view class="height-meta">速度：{{currentSpeed}}</view>
-  </view>
-
-  <view class="card preset-card" wx:if="{{connected}}">
-    <view class="card-title">快速姿势</view>
-    <view class="preset-list">
-      <view class="preset-item-row">
-        <button
-          class="preset-button stand"
-          wx:if="{{activePreset !== 'stand'}}"
-          data-target="stand"
-          bindtap="onPresetTap"
-          disabled="{{standPresetHeight === '--'}}"
-        >
-          <view class="preset-label">站立</view>
-          <view class="preset-value">{{standPresetHeight}}</view>
-        </button>
-        <button
-          class="preset-button stop"
-          wx:else
-          data-target="stand"
-          bindtap="onPresetStop"
-        >
-          停止站立
-        </button>
+    <picker
+      wx:if="{{hasMultipleDesks}}"
+      mode="selector"
+      range="{{deskNames}}"
+      value="{{activeDeskIndex}}"
+      disabled="{{isSwitching}}"
+      bindchange="onDeskPickerChange"
+    >
+      <view class="desk-picker-action">
+        切换桌子
+        <view class="chevron"></view>
       </view>
+    </picker>
+  </view>
 
-      <view class="preset-item-row">
-        <button
-          class="preset-button sit"
-          wx:if="{{activePreset !== 'sit'}}"
-          data-target="sit"
-          bindtap="onPresetTap"
-          disabled="{{sitPresetHeight === '--'}}"
-        >
-          <view class="preset-label">坐下</view>
-          <view class="preset-value">{{sitPresetHeight}}</view>
-        </button>
-        <button
-          class="preset-button stop"
-          wx:else
-          data-target="sit"
-          bindtap="onPresetStop"
-        >
-          停止坐下
-        </button>
-      </view>
+  <view class="height-stage {{connected ? '' : 'height-stage-offline'}}">
+    <view class="height-caption">
+      <view class="desk-icon"></view>
+      <text>桌面高度</text>
+    </view>
+    <view class="height-reading numeric">
+      <text class="height-value">{{connected ? heightValue : '--'}}</text>
+      <text class="height-unit">{{unit}}</text>
+    </view>
+    <view
+      class="movement-status {{isAutoMoving || pendingCommand !== 'stop' ? 'is-pending' : ''}}"
+    >
+      <text wx:if="{{isSwitching}}">正在连接，请稍候</text>
+      <text wx:elif="{{!connected}}">连接后即可读取实时高度</text>
+      <text wx:elif="{{currentHeight === '--'}}">正在读取桌面高度</text>
+      <text wx:elif="{{isAutoMoving}}">正在前往 {{targetHeightDisplay}}</text>
+      <text wx:elif="{{pendingCommand === 'up'}}">正在上升 · 松开即停</text>
+      <text wx:elif="{{pendingCommand === 'down'}}">正在下降 · 松开即停</text>
+      <text wx:else>桌面已静止</text>
+    </view>
+    <text
+      class="speed-reading numeric {{!isAutoMoving && pendingCommand === 'stop' ? 'speed-reading-idle' : ''}}"
+      wx:if="{{connected}}"
+      aria-hidden="{{!isAutoMoving && pendingCommand === 'stop'}}"
+    >
+      当前速度 {{currentSpeed}}
+    </text>
+  </view>
+
+  <view class="connect-prompt" wx:if="{{!connected}}">
+    <button
+      class="button-primary"
+      hover-class="button-pressed"
+      bindtap="navigateToConnection"
+      disabled="{{isSwitching}}"
+    >
+      {{isSwitching ? '连接中…' : '连接升降桌'}}
+    </button>
+  </view>
+
+  <view class="preset-section">
+    <view class="section-heading">
+      <text class="section-title">常用高度</text>
+      <text class="section-note">点按前往</text>
+    </view>
+    <view class="preset-grid">
+      <button
+        class="preset-button {{activePreset === 'sit' ? 'preset-moving' : ''}}"
+        hover-class="button-pressed"
+        data-target="sit"
+        bindtap="onPresetAction"
+        disabled="{{!connected || sitPresetHeight === '--'}}"
+      >
+        <view class="preset-topline">
+          <text>坐下</text>
+          <text class="preset-direction">
+            {{activePreset === 'sit' ? '■' : '↓'}}
+          </text>
+        </view>
+        <text class="preset-value numeric">
+          {{activePreset === 'sit' ? '点按停止' : sitPresetHeight}}
+        </text>
+      </button>
+      <button
+        class="preset-button {{activePreset === 'stand' ? 'preset-moving' : ''}}"
+        hover-class="button-pressed"
+        data-target="stand"
+        bindtap="onPresetAction"
+        disabled="{{!connected || standPresetHeight === '--'}}"
+      >
+        <view class="preset-topline">
+          <text>站立</text>
+          <text class="preset-direction">
+            {{activePreset === 'stand' ? '■' : '↑'}}
+          </text>
+        </view>
+        <text class="preset-value numeric">
+          {{activePreset === 'stand' ? '点按停止' : standPresetHeight}}
+        </text>
+      </button>
     </view>
   </view>
 
-  <view class="card manual-card" wx:if="{{connected}}">
-    <view class="card-title">手动控制</view>
-    <view class="manual-note">长按按钮持续移动，松开即停止。</view>
-    <view class="controls-row">
+  <view class="manual-section">
+    <view class="section-heading">
+      <text class="section-title">手动微调</text>
+      <text class="section-note">按住移动，松开停止</text>
+    </view>
+    <view class="manual-controls">
       <button
-        class="control-button up {{pendingCommand === 'up' ? 'active' : ''}}"
-        data-command="up"
-        bindtouchstart="onControlTouchStart"
-        bindtouchend="onControlTouchEnd"
-        bindtouchcancel="onControlTouchCancel"
-      >
-        <text class="control-icon">↑</text>
-      </button>
-      <button
-        class="control-button down {{pendingCommand === 'down' ? 'active' : ''}}"
+        class="manual-button {{pendingCommand === 'down' ? 'manual-active' : ''}}"
+        hover-class="button-pressed"
         data-command="down"
         bindtouchstart="onControlTouchStart"
         bindtouchend="onControlTouchEnd"
         bindtouchcancel="onControlTouchCancel"
+        disabled="{{!connected}}"
+        aria-label="按住下降，松开停止"
       >
-        <text class="control-icon">↓</text>
+        <text class="control-arrow">↓</text>
+        <text>下降</text>
+      </button>
+      <button
+        class="stop-button {{isAutoMoving || pendingCommand !== 'stop' ? 'stop-active' : ''}}"
+        hover-class="button-pressed"
+        bindtap="onManualStop"
+        disabled="{{!connected}}"
+        aria-label="停止桌子移动"
+      >
+        <view class="stop-symbol"></view>
+        <text>停止</text>
+      </button>
+      <button
+        class="manual-button {{pendingCommand === 'up' ? 'manual-active' : ''}}"
+        hover-class="button-pressed"
+        data-command="up"
+        bindtouchstart="onControlTouchStart"
+        bindtouchend="onControlTouchEnd"
+        bindtouchcancel="onControlTouchCancel"
+        disabled="{{!connected}}"
+        aria-label="按住上升，松开停止"
+      >
+        <text class="control-arrow">↑</text>
+        <text>上升</text>
       </button>
     </view>
+    <text class="control-note">
+      {{connected ? '调整前，请确认桌面上下没有障碍物。' :
+      '连接桌子后即可使用预设与手动控制。'}}
+    </text>
   </view>
 
-  <view class="card tip-card" wx:if="{{!connected}}">
-    <view class="card-title">小贴士</view>
-    <view class="tip-text">请先前往蓝牙页面连接桌子。</view>
+  <view class="control-footer">
+    <button
+      class="button-ghost"
+      hover-class="button-pressed"
+      bindtap="navigateToConnection"
+    >
+      管理设备
+      <view class="chevron"></view>
+    </button>
   </view>
 </view>

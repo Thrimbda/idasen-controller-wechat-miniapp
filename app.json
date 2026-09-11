@@ -5,11 +5,14 @@
     "pages/settings/index"
   ],
   "window": {
-    "navigationBarTitleText": "Idasen 桌子控制器",
-    "navigationBarBackgroundColor": "#1F2933",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#F7F8FA"
+    "navigationBarTitleText": "Desk Controller",
+    "navigationBarBackgroundColor": "@background",
+    "navigationBarTextStyle": "@navigationText",
+    "backgroundColor": "@background",
+    "backgroundTextStyle": "@backgroundText"
   },
   "style": "v2",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "darkmode": true,
+  "themeLocation": "theme.json"
 }

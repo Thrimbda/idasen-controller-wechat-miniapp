@@ -1,76 +1,167 @@
-<view class="page">
-  <view class="card preset-card">
-    <view class="card-title">姿势预设</view>
-
-    <view class="preset-item">
-      <view class="preset-header">
-        <text class="preset-name">站立高度</text>
-        <text class="preset-hint">{{standHeightInput ? '当前 ' + standHeightInput + ' ' + unit : '尚未设置'}}</text>
-      </view>
-      <view class="preset-controls">
-        <input
-          class="preset-input"
-          type="digit"
-          value="{{standHeightInput}}"
-          data-target="stand"
-          bindinput="onPresetInput"
-          placeholder="输入高度"
-        />
-        <text class="unit-label">{{unit}}</text>
-      </view>
-      <view class="preset-actions">
-        <button class="btn ghost" data-target="stand" bindtap="onUseCurrentHeight">使用当前高度</button>
-        <button class="btn primary" data-target="stand" bindtap="onSavePreset">保存</button>
-      </view>
+<view class="page settings-page">
+  <view class="page-header">
+    <view class="header-copy">
+      <text class="eyebrow">DESK CONTROLLER</text>
+      <text class="page-title">使用偏好</text>
     </view>
+  </view>
+  <text class="page-description">记住舒服的高度，让坐站切换更顺手。</text>
 
-    <view class="preset-item">
-      <view class="preset-header">
-        <text class="preset-name">坐下高度</text>
-        <text class="preset-hint">{{sitHeightInput ? '当前 ' + sitHeightInput + ' ' + unit : '尚未设置'}}</text>
+  <view class="section">
+    <view class="section-heading">
+      <text class="section-title">常用高度</text>
+      <text class="section-note">保存后在控制台使用</text>
+    </view>
+    <view class="preset-editor">
+      <view class="preset-heading">
+        <text class="preset-name">坐下</text>
+        <text class="save-state {{sitSaved ? 'is-connected' : ''}}">
+          {{sitSaved ? '已保存' : (sitDirty ? '未保存' : '')}}
+        </text>
       </view>
-      <view class="preset-controls">
+      <label class="height-field {{sitError ? 'field-invalid' : ''}}">
+        <text class="field-label">高度</text>
         <input
-          class="preset-input"
+          class="preset-input numeric"
           type="digit"
           value="{{sitHeightInput}}"
           data-target="sit"
           bindinput="onPresetInput"
           placeholder="输入高度"
+          placeholder-class="input-placeholder"
+          aria-label="坐下高度，{{unit}}"
         />
-        <text class="unit-label">{{unit}}</text>
-      </view>
+        <text class="field-unit">{{unit}}</text>
+      </label>
+      <text class="inline-error" wx:if="{{sitError}}">{{sitError}}</text>
       <view class="preset-actions">
-        <button class="btn ghost" data-target="sit" bindtap="onUseCurrentHeight">使用当前高度</button>
-        <button class="btn primary" data-target="sit" bindtap="onSavePreset">保存</button>
+        <button
+          class="use-current button-ghost"
+          hover-class="button-pressed"
+          data-target="sit"
+          bindtap="onUseCurrentHeight"
+          disabled="{{!canUseCurrentHeight}}"
+        >
+          使用当前高度
+        </button>
+        <button
+          class="save-button button-primary"
+          hover-class="button-pressed"
+          data-target="sit"
+          bindtap="onSavePreset"
+        >
+          保存
+        </button>
       </view>
     </view>
+    <view class="preset-editor">
+      <view class="preset-heading">
+        <text class="preset-name">站立</text>
+        <text class="save-state {{standSaved ? 'is-connected' : ''}}">
+          {{standSaved ? '已保存' : (standDirty ? '未保存' : '')}}
+        </text>
+      </view>
+      <label class="height-field {{standError ? 'field-invalid' : ''}}">
+        <text class="field-label">高度</text>
+        <input
+          class="preset-input numeric"
+          type="digit"
+          value="{{standHeightInput}}"
+          data-target="stand"
+          bindinput="onPresetInput"
+          placeholder="输入高度"
+          placeholder-class="input-placeholder"
+          aria-label="站立高度，{{unit}}"
+        />
+        <text class="field-unit">{{unit}}</text>
+      </label>
+      <text class="inline-error" wx:if="{{standError}}">{{standError}}</text>
+      <view class="preset-actions">
+        <button
+          class="use-current button-ghost"
+          hover-class="button-pressed"
+          data-target="stand"
+          bindtap="onUseCurrentHeight"
+          disabled="{{!canUseCurrentHeight}}"
+        >
+          使用当前高度
+        </button>
+        <button
+          class="save-button button-primary"
+          hover-class="button-pressed"
+          data-target="stand"
+          bindtap="onSavePreset"
+        >
+          保存
+        </button>
+      </view>
+    </view>
+    <text class="input-note">
+      {{canUseCurrentHeight ? '当前桌面高度 ' + currentHeightDisplay :
+      '连接桌子后，可直接使用当前高度。'}}
+    </text>
   </view>
 
-  <view class="card">
-    <view class="card-title">显示单位</view>
-    <radio-group class="radio-group" bindchange="onUnitChange">
-      <label class="radio-item">
-        <radio value="cm" checked="{{unit === 'cm'}}" />
-        <text>厘米 (cm)</text>
+  <view class="section">
+    <view class="section-heading">
+      <text class="section-title">显示单位</text>
+    </view>
+    <radio-group class="unit-options" bindchange="onUnitChange">
+      <label class="unit-option {{unit === 'cm' ? 'unit-selected' : ''}}">
+        <view class="unit-copy">
+          <text>厘米</text>
+          <text class="section-note">cm</text>
+        </view>
+        <radio
+          color="{{controlColor}}"
+          value="cm"
+          checked="{{unit === 'cm'}}"
+        />
       </label>
-      <label class="radio-item">
-        <radio value="inch" checked="{{unit === 'inch'}}" />
-        <text>英寸 (inch)</text>
+      <label class="unit-option {{unit === 'inch' ? 'unit-selected' : ''}}">
+        <view class="unit-copy">
+          <text>英寸</text>
+          <text class="section-note">inch</text>
+        </view>
+        <radio
+          color="{{controlColor}}"
+          value="inch"
+          checked="{{unit === 'inch'}}"
+        />
       </label>
     </radio-group>
   </view>
 
-  <view class="card">
-    <view class="card-title">蓝牙连接</view>
-    <view class="row">
-      <text>自动重连上次设备</text>
-      <switch checked="{{autoReconnect}}" bindchange="onAutoReconnectChange" />
+  <view class="section">
+    <view class="section-heading">
+      <text class="section-title">连接偏好</text>
     </view>
-    <view class="info">
-      <text>当前连接：{{connectedDeviceId || '无'}}</text>
-      <text>当前高度：{{currentHeightDisplay}}</text>
-      <text>指令状态：{{pendingCommand}}</text>
+    <view class="switch-row">
+      <view class="row-copy">
+        <text class="row-title">自动重连</text>
+        <text class="row-hint">打开时连接上次使用的桌子</text>
+      </view>
+      <switch
+        color="{{controlColor}}"
+        checked="{{autoReconnect}}"
+        bindchange="onAutoReconnectChange"
+        aria-label="自动重连上次使用的桌子"
+      />
+    </view>
+    <view class="device-summary">
+      <view class="info-row">
+        <text>当前设备</text>
+        <text>
+          {{connectedDeviceId ? (activeDeskName || '已连接的桌子') : '未连接'}}
+        </text>
+      </view>
+      <view class="info-row" wx:if="{{connectedDeviceId}}">
+        <text>桌子状态</text>
+        <text>
+          {{pendingCommand === 'up' ? '正在上升' : (pendingCommand === 'down' ?
+          '正在下降' : '已静止')}}
+        </text>
+      </view>
     </view>
   </view>
 </view>
